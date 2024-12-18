@@ -1,1 +1,39 @@
+<div class="text-end">
+  <button type="button" id="button-confirm" class="btn btn-primary">{{ button_confirm }}</button>
+</div>
+
+<script type="text/javascript">
+$('#button-confirm').on('click', function () {
+    var element = this;
+
+    $.ajax({
+        url: 'index.php?route=extension/Paymentopencart_v4/payment/paymentopencart_v4.confirm&language={{ language }}',
+        dataType: 'json',
+        beforeSend: function () {
+            $(element).button('loading');
+        },
+        complete: function () {
+            $(element).button('reset');
+        },
+        success: function (json) {
+            if (json['error']) {
+                $('#alert').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa-solid fa-circle-exclamation"></i> ' + json['error'] + ' <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+            }
+
+            if (json['form']) {
+                // Create a form and submit it to send data via POST
+                var form = $('<form action="' + json['action'] + '" method="post"></form>');
+                $.each(json['form'], function(key, value) {
+                    form.append('<input type="hidden" name="' + key + '" value="' + value + '" />');
+                });
+                $('body').append(form);
+                form.submit();
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            console.log(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+    });
+});
+</script>
 
